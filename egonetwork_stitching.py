@@ -43,9 +43,6 @@ class EgoNetwork(object):
 
         self.egos = ego_dataframe
 
-    def set_ego_nodes(self):
-        return None
-
     def random_ego_nodes(self, n_nodes):
         """
         Randomly set egos
@@ -56,6 +53,8 @@ class EgoNetwork(object):
         # Randomly get n_nodes number of nodes
         random_sample = self.vertices.rdd.takeSample(False, n_nodes)
         randomly_infected_nodes = self.sqlContext.createDataFrame(random_sample)
+
+        print randomly_infected_nodes
 
         # Set egos
         self.set_ego_nodes(randomly_infected_nodes)
