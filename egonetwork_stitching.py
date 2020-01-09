@@ -1,8 +1,9 @@
 
 # -*- coding: utf-8 -*-
 
-from util import create_vertices
+import util
 from pyspark.sql.functions import *
+from pyspark.sql.types import *
 
 
 class EgoNetwork(object):
@@ -18,7 +19,7 @@ class EgoNetwork(object):
         # - Allowed values: pyspark dataframe
         # - Contains edges as relationships between objects with columns (src,dst,weight)
         self.edges = edges
-        self.vertices = create_vertices(edges, "src", "dst")
+        self.vertices = util.create_vertices(edges, "src", "dst")
 
         # - Allowed values: python list or pyspark dataframe
         # - Collection of nodes that is center of network
@@ -63,4 +64,19 @@ class EgoNetwork(object):
         return None
 
     def create_egonetworks(self, degree=1, get_altercomm=None):
+
+        ego_neighbors = (self.egos).withColumn("ego_temp", col("Id"))
+        print "nicole"
+        print ego_neighbors.show()
+
+        for i in range(0, degree, 1):
+
+            prev_ego = ego_neighbors.selectExpr("ego_temp as Id")
+            prev_neighbors = neighbors_df.selectExpr("neighbors as Id")
+            ego_step = prev_ego.unionAll(prev_neighbors)
+            ego_step_clean = ego_step.na.drop()
+
+            neighbors = util.get_neighbors(self.edges, ego_step_clean)
+            neighbors_df = neighbors
+
         return None
